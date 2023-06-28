@@ -160,12 +160,14 @@ let docteur_unix (mode : mode) extra_deps disk branch analyze remote =
     let dune =
       Dune.stanzaf
         {dune|
+(dirs %s)
 (rule
- (targets %s)
+ (target %s)
  (enabled_if (= %%{context_name} "default"))
  (deps (:make %%{bin:docteur.make})%a%s)
- (action (run %%{make} %s%a %s)))
+ (action (run %%{make} %s%a %%{target})))
 |dune}
+        source_tree
         disk
         Fmt.(list ~sep:nop (const string " " ++ string))
         extra_deps source_tree remote pp_branch branch disk
@@ -215,12 +217,14 @@ let docteur_solo5 (mode : mode) extra_deps disk branch analyze remote =
     let dune =
       Dune.stanzaf
         {dune|
+(dirs %s)
 (rule
- (targets %s)
+ (target %s)
  (enabled_if (= %%{context_name} "default"))
  (deps (:make %%{bin:docteur.make})%a%s)
- (action (run %%{make} %s%a %s)))
+ (action (run %%{make} %s%a %%{target})))
 |dune}
+        source_tree
         disk
         Fmt.(list ~sep:nop (const string " " ++ string))
         extra_deps source_tree remote pp_branch branch disk
