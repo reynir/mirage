@@ -1,4 +1,5 @@
 open Functoria
+open Mirage_impl_misc
 module Key = Mirage_key
 module Runtime_key = Mirage_runtime_key
 
@@ -8,7 +9,7 @@ let network = Type.v NETWORK
 let all_networks = ref []
 let add_new_network name = all_networks := name :: !all_networks
 
-let network_conf name (intf : string runtime_key) =
+let runtime_network_conf name (intf : string runtime_key) =
   let runtime_keys = [ Runtime_key.v intf ] in
   let packages_v =
     Key.match_ Key.(value target) @@ function
@@ -32,7 +33,36 @@ let network_conf name (intf : string runtime_key) =
   in
   impl ~runtime_keys ~packages_v ~connect ~configure "Netif" network
 
-let netif ?group dev = network_conf dev @@ Runtime_key.interface ?group dev
+let network_conf (intf : string Key.key) =
+  let key = Key.v intf in
+  let keys = [ key ] in
+  let packages_v =
+    Key.match_ Key.(value target) @@ function
+    | `Unix -> [ package ~min:"3.0.0" ~max:"4.0.0" "mirage-net-unix" ]
+    | `MacOSX -> [ package ~min:"1.8.0" ~max:"2.0.0" "mirage-net-macosx" ]
+    | `Xen -> [ package ~min:"2.1.0" ~max:"3.0.0" "mirage-net-xen" ]
+    | `Qubes ->
+        [
+          package ~min:"2.1.0" ~max:"3.0.0" "mirage-net-xen";
+          Mirage_impl_qubesdb.pkg;
+        ]
+    | #Mirage_key.mode_solo5 ->
+        [ package ~min:"0.8.0" ~max:"0.9.0" "mirage-net-solo5" ]
+  in
+  let connect _ modname = function
+    | [ intf ] -> Fmt.str "%s.connect %s" modname intf
+    | _ -> failwith (connect_err "netif" 1)
+  in
+  let configure i =
+    add_new_network (Key.get (Info.context i) intf);
+    Action.ok ()
+  in
+  impl ~keys ~packages_v ~connect ~configure "Netif" network
+
+let netif ?group dev =
+  if_impl Key.is_solo5
+    (network_conf @@ Key.interface ?group dev)
+    (runtime_network_conf dev @@ Runtime_key.interface ?group dev)
 
 let default_network =
   match_impl

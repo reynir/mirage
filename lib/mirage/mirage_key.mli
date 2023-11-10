@@ -70,3 +70,8 @@ val dhcp : ?group:string -> unit -> bool key
 
 val net : ?group:string -> unit -> [ `Direct | `Socket ] option key
 (** The type of stack. Is either ["direct"] or ["socket"]. *)
+
+(** {3 Network keys} *)
+
+val interface : ?group:string -> string -> string key
+(** A network interface *)

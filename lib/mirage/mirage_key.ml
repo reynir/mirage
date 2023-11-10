@@ -141,4 +141,9 @@ let net ?group () : [ `Socket | `Direct ] option Key.key =
   in
   configure_key ~doc ?group ~default:None (Arg.some conv) "net"
 
+(** {3 Network keys} *)
+let interface ?group default =
+  let doc = Fmt.str "The network interface listened by %a." pp_group group in
+  configure_key ~doc ~default ?group Arg.string "interface"
+
 include (Key : Functoria.KEY)
