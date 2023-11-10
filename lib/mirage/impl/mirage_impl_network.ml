@@ -51,7 +51,7 @@ let network_conf (intf : string Key.key) =
   let connect info modname _ =
     let ctx = Info.context info in
     let intf = Key.get ctx intf in
-    Fmt.str "%s.connect %s" modname intf
+    Fmt.str "%s.connect %S" modname intf
   in
   let configure i =
     add_new_network (Key.get (Info.context i) intf);
