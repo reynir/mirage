@@ -1,5 +1,4 @@
 open Functoria
-open Mirage_impl_misc
 module Key = Mirage_key
 module Runtime_key = Mirage_runtime_key
 
@@ -49,9 +48,10 @@ let network_conf (intf : string Key.key) =
     | #Mirage_key.mode_solo5 ->
         [ package ~min:"0.8.0" ~max:"0.9.0" "mirage-net-solo5" ]
   in
-  let connect _ modname = function
-    | [ intf ] -> Fmt.str "%s.connect %s" modname intf
-    | _ -> failwith (connect_err "netif" 1)
+  let connect info modname _ =
+    let ctx = Info.context info in
+    let intf = Key.get ctx intf in
+    Fmt.str "%s.connect %s" modname intf
   in
   let configure i =
     add_new_network (Key.get (Info.context i) intf);
