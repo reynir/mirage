@@ -1,3 +1,12 @@
+### v4.11.2 (2026-07-28)
+
+- Remove `mirage-opam-overlays` from default repositories
+  The repo has been merged with `opam-overlays`. See:
+  - https://github.com/dune-universe/opam-overlays/pull/252
+  - https://github.com/dune-universe/mirage-opam-overlays/pull/9
+  (#1646 @n-osborne)
+- Disable ocamlformat on code format string (#1645 @reynir)
+
 ### v4.11.1 (2026-07-04)
 
 - Raise solo5 upper bounds to < 0.13 (#1641 #1642 @hannesm)
